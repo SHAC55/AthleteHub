@@ -1,5 +1,17 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+//
+import { useState } from "react";
+import Table from "./components/table";
 
+import Fixture from "./components/fixture";
+
+import EPL from "./components/standings/epl";
+import SerieA from "./components/standings/serieA";
+import Laliga from "./components/standings/laliga";
+import Bundesliga from "./components/standings/bundesliga";
+import Ligue from "./components/standings/ligue";
+import Team from "./components/standings/team/team";
+//
 import SignUpPage from "./pages/SignUpPage";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
@@ -56,6 +68,25 @@ const RedirectAuthenticatedUser = ({ children }) => {
 };
 
 function App() {
+  //
+  const [fixtures, setFixtures] = useState([]);
+  const [popUp, setPopUp] = useState(false);
+
+  const fetchInfo = async () => {
+    const data = await fetchFixtures();
+    const test = await fetchTesting();
+
+    const italy = test.response.filter((match) => {
+      return match.country.name === "Spain";
+    });
+
+    setFixtures(data);
+  };
+
+  useEffect(() => {
+    fetchInfo();
+  }, []);
+  //
   const { isCheckingAuth, checkAuth } = useAuthStore();
 
   useEffect(() => {
@@ -106,7 +137,7 @@ function App() {
           path="/Cricketstats"
           element={
             <ProtectedRoute>
-              <Cricketstats/>
+              <Cricketstats />
             </ProtectedRoute>
           }
         />
@@ -114,7 +145,7 @@ function App() {
           path="/Footballstats"
           element={
             <ProtectedRoute>
-              <Footballstats/>
+              <Footballstats />
             </ProtectedRoute>
           }
         />
@@ -122,7 +153,7 @@ function App() {
           path="/Score"
           element={
             <ProtectedRoute>
-              <Score/>
+              <Score />
             </ProtectedRoute>
           }
         />
@@ -191,6 +222,20 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/football/" element={<Table data={fixtures} />}></Route>
+        <Route path="/football/epl" element={<EPL />}></Route>
+        <Route path="/football/seriea" element={<SerieA />}></Route>
+        <Route path="/football/laliga" element={<Laliga />}></Route>
+        <Route path="/football/bundesliga" element={<Bundesliga />}></Route>
+        <Route path="/football/ligue" element={<Ligue />}></Route>
+        <Route
+          path="/football/fixture/:matchID"
+          element={<Fixture data={fixtures} />}
+        ></Route>
+        <Route
+          path="/football/team/:teamID/:leagueID"
+          element={<Team />}
+        ></Route>
         <Route
           path="/user"
           element={
